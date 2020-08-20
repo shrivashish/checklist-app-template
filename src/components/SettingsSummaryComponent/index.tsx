@@ -1,0 +1,1 @@
+export {SettingsSummaryComponent, ISettingsSummaryProps} from './SettingsSummaryComponent';

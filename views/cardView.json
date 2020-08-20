@@ -1,0 +1,141 @@
+{
+    "view": {
+        "type": "AdaptiveCard",
+        "version": "1.0",
+        "body": [{
+                "id": "Sender",
+                "type": "TextBlock",
+                "text": "${creator[0].displayName} sent a Checklist",
+                "size": "small",
+                "wrap": true
+            },
+            {
+                "id": "expiry",
+                "type": "TextBlock",
+                "$when": "${not(equals(action.status, 'Active'))}",
+                "text": "Checklist Closed",
+                "color": "attention",
+                "size": "small",
+                "wrap": true
+            },
+            {
+                "id": "Title",
+                "type": "TextBlock",
+                "text": "${action.displayName}",
+                "size": "large",
+                "maxLines": 3,
+                "wrap": true,
+                "weight": "bolder",
+                "spacing": "small"
+            },
+            {
+                "id": "Count",
+                "type": "TextBlock",
+                "$when": "${greater(count(dataRows),0)}",
+                "text": "Number of items in checklist :  ${if(not(empty(dataRows)),count(dataRows),0)}",
+                "size": "small",
+                "maxLines": 3,
+                "wrap": true,
+                "weight": "bolder",
+                "spacing": "small"
+            },
+            {
+                "id": "OpenItems1",
+                "type": "TextBlock",
+                "$when": "${equals(count(dataRows),0)}",
+                "text": "No item in checklist",
+                "size": "small",
+                "maxLines": 3,
+                "wrap": true,
+                "weight": "bolder",
+                "spacing": "small"
+            },
+            {
+                "id": "OpenItems2",
+                "type": "TextBlock",
+                "$when": "${and(equals(action.status, 'Active'),greater(count(dataRows), 0))}",
+                "text": "Open items",
+                "size": "small",
+                "maxLines": 3,
+                "wrap": true,
+                "weight": "bolder",
+                "spacing": "small"
+            },
+            {
+                "id": "rows",
+                "type": "Input.ChoiceSet",
+                "style": "expanded",
+                "isMultiSelect": true,
+                "choices": [{
+                    "$data": "${string(subArray(sortBy(where(dataRows, x, x.columnValues['status'] == 'ACTIVE'), 'createTime'), 0, min(10, count(where(dataRows, x, x.columnValues['status'] == 'ACTIVE')))))}",
+                    "$when": "${equals(columnValues['status'],'ACTIVE')}",
+                    "title": "${columnValues['checklistItem']}",
+                    "value": "{'id':'${id}','columnValues':{'status':'COMPLETED','completionTime':'$Timestamp','completionUser':'$UserId','latestEditTime':'$Timestamp','latestEditUser':'$UserId'}}"
+                }]
+            },
+            {
+                "id": "LastModified",
+                "type": "TextBlock",
+                "$when": "${equals(action.status, 'Active')}",
+                "text": "Last updated by ${lastResponder[0].displayName}",
+                "size": "small",
+                "weight": "bolder",
+                "maxLines": 2,
+                "wrap": true,
+                "spacing": "small"
+            }
+        ],
+        "actions": [{
+                "id": "RespondButton",
+                "$when": "${equals(action.status, 'Active')}",
+                "title": "Save Changes",
+                "command": "SubmitCustomActionDataRows"
+            },
+            {
+                "id": "EditChecklistButton",
+                "$when": "${equals(action.status, 'Active')}",
+                "title": "Edit Checklist",
+                "command": "LaunchActionPackageView",
+                "parameters": {
+                    "viewName": "UpdateView"
+                }
+            },
+            {
+                "id": "ViewChecklistButton",
+                "$when": "${not(equals(action.status, 'Active'))}",
+                "title": "View Checklist",
+                "command": "LaunchActionPackageView",
+                "parameters": {
+                    "viewName": "UpdateView"
+                }
+
+            }
+        ]
+    },
+    "data": {
+        "action": {
+            "command": "GetAction"
+        },
+        "dataRows": {
+            "command": "GetActionDataRows",
+            "parameters": {
+                "pageSize": 100
+            }
+        },
+        "creator": {
+            "command": "GetSubscriptionMembers",
+            "parameters": {
+                "memberIds": ["$ActionCreator"]
+            }
+        },
+        "lastResponder": {
+            "command": "GetSubscriptionMembers",
+            "parameters": {
+                "memberIds": [
+                    "$CurrentUser"
+                ]
+            }
+        }
+
+    }
+}
