@@ -88,10 +88,10 @@
   "$manifest.composeExtensions[0].commands[0].taskInfo.title": "إنشاء قائمة اختيار جديدة",
   "$manifest.composeExtensions[0].commands[0].title": "إنشاء قائمة اختيار جديدة",
   "$manifest.description.full": "تعاون مع فريقك في العمل من خلال إنشاء قائمة اختيار مشتركة في إحدى الدردشات أو القنوات.\n• يمكنك الحصول على التطبيق \"…\" ضم مربع إنشا الرسالة\n• أضف اسماً لقائمة الاختيار، وأدخل العناصر، وبهذا ستتمكن من ذلك 👍🏻\n• تتبع العناصر المفتوحة مباشرة من الدردشة\n• أضف/احذف/حرر/أكمل العناصر وقم بإدارة قائمة الاختيار عبر التجربة الشاملة",
-  "$manifest.description.short": "Create a shared checklist",
+  "$manifest.description.short": "إنشاء قائمة اختيار مشتركة",
   "$manifest.name.full": "قائمة اختيار",
   "$manifest.name.short": "قائمة اختيار",
-  "$manifest.activities.activityTypes[0].description": "Someone updates your checklist",
-  "$manifest.activities.activityTypes[1].description": "Daily digest of item completion status",
-  "$manifest.activities.activityTypes[2].description": "On checklist completion"
+  "$manifest.activities.activityTypes[0].description": "يقوم شخص ما بتحديث قائمة الاختيار الخاصة بك",
+  "$manifest.activities.activityTypes[1].description": "الملخص اليومي لحالة اكتمال العنصر",
+  "$manifest.activities.activityTypes[2].description": "عند إكمال قائمة الاختيار"
 }

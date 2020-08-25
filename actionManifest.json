@@ -2,11 +2,11 @@
     "id": "<packageId>",
     "name": "Checklist",
     "description": "Create a shared checklist",
-    "provider": {
-        "name": "Microsoft",
-        "websiteUrl": "https://www.microsoft.com/",
-        "privacyUrl": "https://www.microsoft.com/privacy",
-        "termsOfUseUrl": "https://www.microsoft.com/app-tos"
+    "developer": {
+        "name": "<name>",
+        "websiteUrl": "<websiteUrl>",
+        "privacyUrl": "<privacyUrl>",
+        "termsOfUseUrl": "<termsOfUseUrl>"
     },
     "icon": "images/appIcon.png",
     "version": "1.0.0",
@@ -83,5 +83,20 @@
             "zh-cn": "strings/zh-cn/strings.json",
             "zh-tw": "strings/zh-tw/strings.json"
         }
+    },
+    "msTeamsProps": {
+        "name": {
+            "short": "Checklist",
+            "full": "Checklist"
+        },
+        "description": {
+            "short": "Create a shared checklist",
+            "full": "Collaborate with your team by creating a shared checklist in a chat or channel.​ Find the app in \"…\" under the message compose box​. Name your checklist, enter items, and you're good to go. Keep track of open items right from chat​. Add/delete/edit/complete items and manage checklist through an immersive experience"
+        },
+        "icons": {
+            "color": "images/appIcon.png",
+            "outline": "images/outline.png"
+        },
+        "accentColor": "#4464ee"
     }
 }
