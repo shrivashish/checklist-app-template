@@ -1,9 +1,3 @@
-<<<<<<< Updated upstream
-import * as uuid from "uuid";
-
-export namespace Utils {
-
-=======
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
@@ -11,7 +5,6 @@ import * as uuid from "uuid";
 
 export namespace Utils {
 
->>>>>>> Stashed changes
   export function isValidJson(json: string): boolean {
     try {
       JSON.parse(JSON.stringify(json));

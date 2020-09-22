@@ -66,8 +66,4 @@ export let setProgressState = action(ChecklistCreationAction.setProgressState, (
 export let setSendingFlag = action(
     ChecklistCreationAction.setSendingFlag,
     (value: boolean) => ({ value: value })
-<<<<<<< Updated upstream
 );
-=======
-);
->>>>>>> Stashed changes

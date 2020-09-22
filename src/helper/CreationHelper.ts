@@ -1,9 +1,6 @@
-<<<<<<< Updated upstream
-=======
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
->>>>>>> Stashed changes
 import * as actionSDK from "@microsoft/m365-action-sdk";
 import { Utils } from "../utils/Utils";
 import { Constants } from "../utils/Constants";
@@ -84,8 +81,4 @@ export function validateChecklistCreation(actionInstance: actionSDK.Action, acti
 		return false;
 	}
 	return true;
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

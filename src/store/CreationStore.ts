@@ -1,9 +1,6 @@
-<<<<<<< Updated upstream
-=======
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
->>>>>>> Stashed changes
 import { createStore } from "satcheljs";
 import { ChecklistItem } from "../utils";
 import "../orchestrators/CreationOrchestrators";

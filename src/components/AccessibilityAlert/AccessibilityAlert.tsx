@@ -1,9 +1,6 @@
-<<<<<<< Updated upstream
-=======
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
->>>>>>> Stashed changes
 import * as React from "react";
 import { Utils } from "../../utils/Utils";
 
@@ -17,8 +14,4 @@ import { Utils } from "../../utils/Utils";
 export function AccessibilityAlert(props) {
     return (!Utils.isEmptyString(props.alertText)
         && <div role="alert" aria-label={props.alertText} />);
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

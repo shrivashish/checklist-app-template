@@ -1,9 +1,6 @@
-<<<<<<< Updated upstream
-=======
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
->>>>>>> Stashed changes
 import {
 	addChecklistItems,
 	updateSubtitleText,
@@ -298,8 +295,4 @@ export function getActionInstanceProperty(
 		}
 	}
 	return null;
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

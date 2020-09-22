@@ -1,9 +1,6 @@
-<<<<<<< Updated upstream
-=======
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
->>>>>>> Stashed changes
 import * as React from "react";
 import { Flex, Text } from "@fluentui/react-northstar";
 import "./NavBarComponent.scss";
