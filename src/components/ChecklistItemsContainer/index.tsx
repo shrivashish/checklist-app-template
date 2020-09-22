@@ -1,3 +1,3 @@
-import { ChecklistItemsContainer, IChecklistItemsContainerProps } from './ChecklistItemsContainer';
+import { ChecklistItemsContainer, IChecklistItemsContainerProps } from "./ChecklistItemsContainer";
 
-export { ChecklistItemsContainer, IChecklistItemsContainerProps }
+export { ChecklistItemsContainer, IChecklistItemsContainerProps };

@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { ActionSDKUtils } from '../../utils/ActionSDKUtils';
+import * as React from "react";
+import { Utils } from "../../utils/Utils";
 
 /**
  * A functional component which reads out the alert on screen
@@ -9,6 +9,6 @@ import { ActionSDKUtils } from '../../utils/ActionSDKUtils';
  */
 
 export function AccessibilityAlert(props) {
-    return (!ActionSDKUtils.isEmptyString(props.alertText)
-        && <div role="alert" aria-label={props.alertText} />)
+    return (!Utils.isEmptyString(props.alertText)
+        && <div role="alert" aria-label={props.alertText} />);
 }

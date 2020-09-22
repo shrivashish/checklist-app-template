@@ -1,17 +1,18 @@
 import * as React from "react";
 import "./InputBox.scss";
 import { Input, InputProps, Text, Flex, ShorthandValue, BoxProps, ExclamationCircleIcon } from "@fluentui/react-northstar";
-import { IErrorProps } from "../common";
-import { ActionSDKUtils } from "../../utils/ActionSDKUtils";
+import { Utils } from "../../utils/Utils";
 
-export interface IInputBoxProps extends IErrorProps, InputProps {
+export interface IInputBoxProps extends InputProps {
     multiline?: boolean;
     prefixJSX?: JSX.Element;
+    showError?: boolean;
+    errorText?: string;
 }
 
 const errorIcon: ShorthandValue<BoxProps> = {
     content: <ExclamationCircleIcon className="settings-icon" outline={true} color="brand" />
-}
+};
 
 enum RenderAs {
     Input,
@@ -32,7 +33,7 @@ export class InputBox extends React.Component<IInputBoxProps> {
     }
 
     componentDidMount() {
-        if (this.renderAs == RenderAs.TextArea && (!ActionSDKUtils.isEmptyObject(this.props.value) || !ActionSDKUtils.isEmptyObject(this.props.defaultValue))) {
+        if (this.renderAs == RenderAs.TextArea && (!Utils.isEmptyObject(this.props.value) || !Utils.isEmptyObject(this.props.defaultValue))) {
             // Updating height only in case when there is some text in input box becasue if there is no text then rows=1 will show only 1 line.
             // There might be some senario in which element is not completely painted to get their scroll height. Refer https://stackoverflow.com/questions/26556436/react-after-render-code
             // In such cases the height of input box become wrong(looks very large or very small), which usaully occurs on very first load.
@@ -52,9 +53,24 @@ export class InputBox extends React.Component<IInputBoxProps> {
 
         return (
             <Flex column>
-                {(this.props.showError && !ActionSDKUtils.isEmptyObject(this.props.errorText))
+                {(this.props.showError && !Utils.isEmptyObject(this.props.errorText))
                     && <Text align="end" error>{this.props.errorText}</Text>}
                 {this.props.prefixJSX ? this.getInputItem() : this.getInput()}
+            </Flex>
+        );
+    }
+
+    public focus() {
+        if (this.inputElement) {
+            this.inputElement.focus();
+        }
+    }
+
+    getInputItem(): JSX.Element {
+        return (
+            <Flex gap="gap.smaller">
+                {this.props.prefixJSX}
+                {this.getInput()}
             </Flex>
         );
     }
@@ -74,14 +90,16 @@ export class InputBox extends React.Component<IInputBoxProps> {
             {...this.getInputProps()}
             onChange={(event, data) => {
                 this.autoAdjustHeight();
-                if (this.props.onChange)
+                if (this.props.onChange) {
                     this.props.onChange(event, data);
+                }
             }}
             onClick={this.props.disabled ? null : (event) => {
                 // Adjusting height if by any reason wrong height get applied in componentDidMount.
                 this.autoAdjustHeight();
-                if (this.props.onClick)
+                if (this.props.onClick) {
                     this.props.onClick(event);
+                }
             }}
         />);
     }
@@ -90,10 +108,10 @@ export class InputBox extends React.Component<IInputBoxProps> {
         if (this.renderAs == RenderAs.TextArea) {
             this.autoAdjustHeight();
         } else if (this.renderAs == RenderAs.Span) {
-            var text: string = "";
-            if (!ActionSDKUtils.isEmptyObject(this.props.value)) {
+            let text: string = "";
+            if (!Utils.isEmptyObject(this.props.value)) {
                 text = this.props.value.toString();
-            } else if (!ActionSDKUtils.isEmptyObject(this.props.defaultValue)) {
+            } else if (!Utils.isEmptyObject(this.props.defaultValue)) {
                 text = this.props.defaultValue.toString();
             }
             this.inputElement.innerText = text;
@@ -102,12 +120,12 @@ export class InputBox extends React.Component<IInputBoxProps> {
 
     private autoAdjustHeight() {
         if (this.renderAs == RenderAs.TextArea) {
-            this.inputElement.style.height = '';
+            this.inputElement.style.height = "";
 
             if (this.bottomBorderWidth == -1) {
-                this.bottomBorderWidth = parseFloat(getComputedStyle(this.inputElement).getPropertyValue('border-bottom-width'));
+                this.bottomBorderWidth = parseFloat(getComputedStyle(this.inputElement).getPropertyValue("border-bottom-width"));
             }
-            this.inputElement.style.height = this.inputElement.scrollHeight + this.bottomBorderWidth + 'px';
+            this.inputElement.style.height = this.inputElement.scrollHeight + this.bottomBorderWidth + "px";
         }
     }
 
@@ -115,16 +133,16 @@ export class InputBox extends React.Component<IInputBoxProps> {
 
         let icon = this.props.icon;
         if (!icon) {
-            icon = this.props.showError ? errorIcon : null
+            icon = this.props.showError ? errorIcon : null;
         }
 
         this.incomingInputRef = this.props.inputRef;
         let inputRef = (input) => {
             this.inputElement = input;
             if (this.incomingInputRef) {
-                if (typeof this.incomingInputRef === 'function') {
+                if (typeof this.incomingInputRef === "function") {
                     this.incomingInputRef(input);
-                } else if (typeof this.incomingInputRef === 'object') {
+                } else if (typeof this.incomingInputRef === "object") {
                     this.incomingInputRef.current = input;
                 }
             }
@@ -134,14 +152,14 @@ export class InputBox extends React.Component<IInputBoxProps> {
         if (this.renderAs == RenderAs.TextArea) {
             input = {
                 ...input,
-                as: 'textarea',
+                as: "textarea",
                 rows: 1
-            }
+            };
         } else if (this.renderAs == RenderAs.Span) {
             input = {
                 ...input,
-                as: 'span'
-            }
+                as: "span"
+            };
         }
 
         return {
@@ -157,29 +175,16 @@ export class InputBox extends React.Component<IInputBoxProps> {
     }
 
     private getClassName() {
-        let classNames: string[] = ['multiline-input-box'];
-        if (this.props.className)
+        let classNames: string[] = ["multiline-input-box"];
+        if (this.props.className) {
             classNames.push(this.props.className);
-
-        if (this.props.showError)
-            classNames.push('invalid');
-
-        return classNames.join(' ');
-    }
-
-    public focus() {
-        if (this.inputElement) {
-            this.inputElement.focus();
         }
-    }
 
-    getInputItem(): JSX.Element {
-        return (
-            <Flex gap="gap.smaller">
-                {this.props.prefixJSX}
-                {this.getInput()}
-            </Flex>
-        );
+        if (this.props.showError) {
+            classNames.push("invalid");
+        }
+
+        return classNames.join(" ");
     }
 
 }

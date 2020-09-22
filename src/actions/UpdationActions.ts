@@ -1,7 +1,7 @@
 import { action } from "satcheljs";
 import { ChecklistItem } from "../utils";
 import * as actionSDK from "@microsoft/m365-action-sdk";
-import { InitializationState } from "../../src/components/common";
+import {ProgressState} from "../utils/SharedEnum";
 
 export enum ChecklistUpdationAction {
   initialize = "initialize",
@@ -20,12 +20,11 @@ export enum ChecklistUpdationAction {
   checklistCloseAlertOpen = "checklistCloseAlertOpen",
   checklistDeleteAlertOpen = "checklistDeleteAlertOpen",
   checklistExpiryChangeAlertOpen = "checklistExpiryChangeAlertOpen",
-  updateDueDate = "updateDueDate",
   updateSubtitleText = "updateSubtitleText",
   fetchActionInstanceRowsUserDetails = "fetchActionInstanceRowsUserDetails",
   downloadingData = "downloadingData",
   setSendingFlag = "setSendingFlag",
-  setAppInitialized = "setAppInitialized",
+  setProgressState = "setProgressState",
   saveChangesFailed = "saveChangesFailed",
   downloadReportFailed = "downloadReportFailed",
   closeChecklistFailed = "closeChecklistFailed",
@@ -116,14 +115,6 @@ export let addChecklistItems = action(
   (items: actionSDK.ActionDataRow[]) => ({ items: items })
 );
 
-export let updateDueDate = action(
-  "updateDueDate",
-  (dueDate: number, updatingDueDate: boolean) => ({
-    dueDate: dueDate,
-    updatingDueDate: updatingDueDate,
-  })
-);
-
 export let setDownloadingData = action(
   "downloadingData",
   (downloadingData: boolean) => ({ downloadingData: downloadingData })
@@ -146,11 +137,9 @@ export let setSendingFlag = action(
   (value: boolean) => ({ value: value })
 );
 
-export let setAppInitialized = action(
-  ChecklistUpdationAction.setAppInitialized,
-  (state: InitializationState) => ({ state: state })
-);
-
+export let setProgressState = action(ChecklistUpdationAction.setProgressState, (state: ProgressState) => ({
+  state: state
+}));
 
 export let saveChangesFailed = action(
   ChecklistUpdationAction.saveChangesFailed,

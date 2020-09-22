@@ -8,32 +8,26 @@ import {
   updateTitle,
   updateChoiceText,
   changeItemCheckedStatus,
-  setSettings,
-  goToPage
 } from "../../actions/CreationActions";
-import "../../css/creation";
-import getStore, { Page } from "../../store/CreationStore";
+import "../Creation/Creation.scss";
+import getStore from "../../store/CreationStore";
 import { observer } from "mobx-react";
 import {
   Flex,
   Text,
   FlexItem,
   AddIcon,
-  ArrowDownIcon,
+  Button
 } from "@fluentui/react-northstar";
-import { ADD_ITEM_DIV_ID } from "../../utils/Utils";
 import { Localizer } from "../../utils/Localizer";
-import { ActionSDKUtils } from "../../utils/ActionSDKUtils";
-import * as actionSDK from "@microsoft/m365-action-sdk";
-import { ISettingsComponentProps, SettingsSections, ISettingsProps, Settings, ISettingsComponentStrings, SettingsMobile } from "../SettingsComponent";
-import { INavBarComponentProps, NavBarComponent, NavBarItemType } from "../NavBarComponent";
-import { UxUtils, InitializationState } from "../common";
+import { Utils } from "../../utils/Utils";
+import { UxUtils } from "../../utils/UxUtils";
+import {ProgressState} from "../../utils/SharedEnum";
 import { LoaderUI } from "../Loader";
 import { ErrorView } from "../ErrorView";
 import { InputBox } from "../InputBox";
-import { ButtonComponent } from "../Button";
 import { ActionSdkHelper } from "../../helper/ActionSdkHelper";
-
+import {Constants} from "../../utils/Constants";
 
 @observer
 export default class CreationPage extends React.Component<any, any> {
@@ -53,9 +47,10 @@ export default class CreationPage extends React.Component<any, any> {
   }
 
   render() {
-    if (getStore().isInitialized === InitializationState.NotInitialized) {
+    let progressState = getStore().progressState;
+    if (progressState === ProgressState.NotStarted || progressState == ProgressState.InProgress) {
       return <LoaderUI fill />;
-    } else if (getStore().isInitialized === InitializationState.Failed) {
+    } else if (getStore().progressState === ProgressState.Failed) {
       ActionSdkHelper.hideLoadIndicator();
       return (
         <ErrorView
@@ -65,11 +60,7 @@ export default class CreationPage extends React.Component<any, any> {
       );
     } else {
      ActionSdkHelper.hideLoadIndicator();
-      if (UxUtils.renderingForMobile()) {
-            
-      if (getStore().currentPage == Page.Settings) {
-          return this.renderSettingsPageForMobile();
-        } else {
+     if (UxUtils.renderingForMobile()) {
           return (
             <Flex className="body-container no-mobile-footer">
               {this.renderChecklistSection()}
@@ -78,17 +69,7 @@ export default class CreationPage extends React.Component<any, any> {
               </div>
             </Flex>
           );
-        }
       } else {
-        if (getStore().currentPage == Page.Settings) {
-          let settingsProps: ISettingsProps = {
-            ...this.getCommonSettingsProps(),
-            onBack: () => {
-              goToPage(Page.Main);
-            },
-          };
-          return <Settings {...settingsProps} />;
-        } else {
           return (
             <>
               <Flex className="body-container" column>
@@ -97,7 +78,6 @@ export default class CreationPage extends React.Component<any, any> {
               {this.renderFooterSection()}
             </>
           );
-        }
       }
     }
   }
@@ -107,7 +87,7 @@ export default class CreationPage extends React.Component<any, any> {
     if (getStore().showBlankTitleError) {
       accessibilityAnnouncementString = Localizer.getString("BlankTitleError");
     }
-    ActionSDKUtils.announceText(accessibilityAnnouncementString);
+    Utils.announceText(accessibilityAnnouncementString);
     return (
       <div className="checklist-section">
         <InputBox
@@ -138,6 +118,8 @@ export default class CreationPage extends React.Component<any, any> {
           ref={(child) => (this.checklistItemsRef = child)}
           sectionType={ChecklistGroupType.All}
           items={getStore().items}
+          closed={false}
+          expired={false}
           onToggleDeleteItem={(i) => {
             deleteChoice(i);
           }}
@@ -152,7 +134,7 @@ export default class CreationPage extends React.Component<any, any> {
           }}
         />
         <div
-          id={ADD_ITEM_DIV_ID}
+          id={Constants.ADD_ITEM_DIV_ID}
           className="add-options-cl"
           {...UxUtils.getTabKeyProps()}
           onClick={() => {
@@ -176,52 +158,17 @@ export default class CreationPage extends React.Component<any, any> {
     );
   }
 
-  private onAddChoice() {
-    addChoice();
-    this.checklistItemsRef.getFocusToLastElement();
-    if (!UxUtils.renderingForiOS())
-      document.getElementById("pseudo-element").scrollIntoView();
-  }
-
-  renderSettingsPageForMobile() {
-    let navBarComponentProps: INavBarComponentProps = {
-      title: Localizer.getString("Settings"),
-      leftNavBarItem: {
-        icon: <ArrowDownIcon outline size="large" rotate={90} />,
-        ariaLabel: Localizer.getString("Back"),
-        onClick: () => {
-          goToPage(Page.Main);
-        },
-        type: NavBarItemType.BACK,
-      },
-    };
-
-    return (
-      <Flex className="body-container no-mobile-footer" column>
-        <NavBarComponent {...navBarComponentProps} />
-        <SettingsMobile {...this.getCommonSettingsProps()} />
-      </Flex>
-    );
-  }
-
-  //Notification is not enabled
-  renderFooterSettingsSection() {
-    //if (getStore().context.isNotificationEnabled) {
-      return null;
-  }
-
   renderFooterSection() {
     let buttonText: string = Localizer.getString("SendChecklist");
-
     buttonText = Localizer.getString("Next");
     return (
       <Flex className="footer-layout" gap="gap.small">
-        {this.renderFooterSettingsSection()}
         <FlexItem push>
-          <ButtonComponent
+          <Button
             primary
             content={buttonText}
-            showLoader={getStore().isSending}
+            loading={getStore().isSending}
+            disabled={getStore().isSending}
             onClick={() => {
               callActionInstanceCreationAPI();
             }}
@@ -231,44 +178,12 @@ export default class CreationPage extends React.Component<any, any> {
     );
   }
 
-  getCommonSettingsProps() {
-    let excludeSettingsSections: SettingsSections[] = [
-      SettingsSections.MULTI_RESPONSE,
-      SettingsSections.RESULTS_VISIBILITY,
-      SettingsSections.DUE_BY,
-    ];
-    /*  if (!getStore().context.isNotificationEnabled) {
-      excludeSettingsSections.push(SettingsSections.NOTIFICATIONS);
-    }*/
-    excludeSettingsSections.push(SettingsSections.NOTIFICATIONS);
-    return {
-      notificationSettings: getStore().settings.notificationSettings,
-      resultVisibility: getStore().settings.resultVisibility,
-      isResponseAnonymous: getStore().settings.isResponseAnonymous,
-      isResponseEditable: getStore().settings.isResponseAnonymous,
-      dueDate: getStore().settings.dueDate,
-      locale: getStore().context.locale,
-      renderForMobile: UxUtils.renderingForMobile(),
-      excludeSections: excludeSettingsSections,
-      strings: this.getStringsForSettings(),
-      onChange: (props: ISettingsComponentProps) => {
-        setSettings(props);
-      },
-    };
+  private onAddChoice() {
+    addChoice();
+    this.checklistItemsRef.getFocusToLastElement();
+    if (!UxUtils.renderingForiOS()) {
+      document.getElementById("pseudo-element").scrollIntoView();
+    }
   }
 
-  /**
-   * Strings are not there, please add if enabling settings
-   */
-  getStringsForSettings(): ISettingsComponentStrings {
-    let settingsComponentStrings: ISettingsComponentStrings = {
-      notifications: Localizer.getString("notifications"),
-      notificationsAsResponsesAsReceived: Localizer.getString(
-        "notificationsAsResponsesAsReceived"
-      ),
-      notificationsEverydayAt: Localizer.getString("notificationsEverydayAt"),
-      notificationsNever: Localizer.getString("notificationsNever"),
-    };
-    return settingsComponentStrings;
-  }
 }

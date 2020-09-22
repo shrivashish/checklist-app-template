@@ -1,14 +1,15 @@
 import * as React from "react";
 import { Status, ChecklistItem } from "../../utils/index";
 import "./ChecklistItemsContainer.scss";
-import { isChecklistExpired, isChecklistClosed, ADD_ITEM_DIV_ID } from "../../utils/Utils";
 import { ChecklistItemView, IChecklistItemProps } from "./ChecklistItemView";
 import { ChecklistGroupType } from "../../utils/EnumContainer";
-import { IErrorProps, IUIProps, Constants } from "../../components/common";
+import {Constants} from "../../utils/Constants";
 
-export interface IChecklistItemsContainerProps extends IErrorProps, IUIProps {
+export interface IChecklistItemsContainerProps {
     sectionType: string;
     items: ChecklistItem[];
+    closed: boolean;
+    expired: boolean;
     onUpdateItem?: (i: ChecklistItem, value: string) => void;
     onToggleDeleteItem?: (i: ChecklistItem) => void;
     onItemChecked?: (i: ChecklistItem, value: boolean) => void;
@@ -45,6 +46,8 @@ export class ChecklistItemsContainer extends React.Component<IChecklistItemsCont
                     item={this.props.items[i]}
                     key={this.getKeyForInput(i)}
                     autoFocus={autoFocus}
+                    closed= {this.props.closed}
+                    expired= {this.props.expired}
                     onToggleDeleteItem={i => {
                         this.props.onToggleDeleteItem(i);
                         this.resetFocus();
@@ -54,7 +57,7 @@ export class ChecklistItemsContainer extends React.Component<IChecklistItemsCont
                             if (nextItem) {
                                 document.getElementById(nextItem.localKey).focus();
                             } else {
-                                document.getElementById(ADD_ITEM_DIV_ID).focus();
+                                document.getElementById(Constants.ADD_ITEM_DIV_ID).focus();
                             }
                         }
                     }}
@@ -72,9 +75,7 @@ export class ChecklistItemsContainer extends React.Component<IChecklistItemsCont
                         //  Intercept Enter keypress to move focus to next item
                         if (!event.repeat &&
                             (event.which || event.keyCode) ==
-                            Constants.CARRIAGE_RETURN_ASCII_VALUE &&
-                            !isChecklistClosed() &&
-                            !isChecklistExpired()) {
+                            Constants.CARRIAGE_RETURN_ASCII_VALUE) {
                             let nextItem: ChecklistItem = this.getNextItem(item);
                             if (nextItem) {
                                 this.resetFocus();

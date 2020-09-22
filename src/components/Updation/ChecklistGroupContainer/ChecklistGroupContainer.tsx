@@ -1,19 +1,19 @@
 import * as React from "react";
 import { Flex, Text, AddIcon } from "@fluentui/react-northstar";
-import { ChecklistGroupType, ChecklistItem } from "../../utils/index";
-import { ChecklistItemsContainer } from "../ChecklistItemsContainer";
+import { ChecklistGroupType, ChecklistItem } from "../../../utils/index";
+import { ChecklistItemsContainer } from "../../ChecklistItemsContainer";
 import "./ChecklistGroupContainer.scss";
 import {
   isChecklistExpired,
-  isChecklistClosed,
-  ADD_ITEM_DIV_ID,
-} from "../../utils/Utils";
-import { Status } from "../../utils/EnumContainer";
-import { Localizer } from "../../utils/Localizer";
-import { IErrorProps, IUIProps, UxUtils } from "../../components/common";
-import { ShimmerContainer } from "../../components/ShimmerLoader";
+  isChecklistClosed
+} from "../../../helper/UpdationHelper";
+import { Status } from "../../../utils/EnumContainer";
+import { Localizer } from "../../../utils/Localizer";
+import {UxUtils} from "../../../utils/UxUtils";
+import { ShimmerContainer } from "../../ShimmerLoader";
+import {Constants} from "../../../utils/Constants";
 
-export interface IChecklistGroupContainerProps extends IErrorProps, IUIProps {
+export interface IChecklistGroupContainerProps {
   sectionType: ChecklistGroupType;
   items: ChecklistItem[];
   addChoice?: () => void;
@@ -62,8 +62,9 @@ export class ChecklistGroupContainer extends React.Component<
       if (props.addChoice) {
         props.addChoice();
         checklistItemsRef.getFocusToLastElement();
-        if (!UxUtils.renderingForiOS())
-          document.getElementById(ADD_ITEM_DIV_ID).scrollIntoView();
+        if (!UxUtils.renderingForiOS()) {
+          document.getElementById(Constants.ADD_ITEM_DIV_ID).scrollIntoView();
+        }
       }
     };
 
@@ -73,6 +74,8 @@ export class ChecklistGroupContainer extends React.Component<
           <ChecklistItemsContainer
             sectionType={props.sectionType}
             items={props.items}
+            closed={isChecklistClosed()}
+            expired={isChecklistExpired()}
             ref={(child) => (checklistItemsRef = child)}
             onToggleDeleteItem={(i) => {
               props.toggleDeleteChoice(i);
@@ -92,7 +95,7 @@ export class ChecklistGroupContainer extends React.Component<
           !isChecklistExpired() &&
           !isChecklistClosed() ? (
             <div
-              id={ADD_ITEM_DIV_ID}
+              id={Constants.ADD_ITEM_DIV_ID}
               className="add-options-cl"
               {...UxUtils.getTabKeyProps()}
               onClick={() => {

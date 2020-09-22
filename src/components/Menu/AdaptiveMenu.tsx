@@ -1,9 +1,9 @@
-import * as React from 'react';
+import * as React from "react";
 
 import { Menu, Text, Flex, Dialog } from "@fluentui/react-northstar";
 import { AdaptiveMenuItem } from "./AdaptiveMenuItem";
 
-import './AdaptiveMenu.scss';
+import "./AdaptiveMenu.scss";
 
 export enum AdaptiveMenuRenderStyle {
     MENU,
@@ -52,7 +52,7 @@ export class AdaptiveMenu extends React.Component<IAdaptiveMenuProps, IAdaptiveM
                     open={this.state.menuOpen}
                     className="hide-default-dialog-container"
                     content={
-                        <Flex className="actionsheet-view-bg" onClick={() => { this.setState({ menuOpen: !this.state.menuOpen }) }}>
+                        <Flex className="actionsheet-view-bg" onClick={() => { this.setState({ menuOpen: !this.state.menuOpen }); }}>
                             {this.getDismissButtonForActionSheet()}
                             <Flex role="menu" column className="actionsheet-view-container">
                                 {this.getActionSheetItems()}
@@ -70,7 +70,7 @@ export class AdaptiveMenu extends React.Component<IAdaptiveMenuProps, IAdaptiveM
         this.props.menuItems.forEach((menuItem) => {
             let menuItemProps: IAdaptiveMenuItemComponentProps = {
                 menuItem: menuItem
-            }
+            };
             actionSheetItems.push(<AdaptiveMenuItemComponent {...menuItemProps}
                 ref={(ref: AdaptiveMenuItemComponent) => {
                     if (index === 0 && ref) {
@@ -92,7 +92,7 @@ export class AdaptiveMenu extends React.Component<IAdaptiveMenuProps, IAdaptiveM
                 tabIndex={0}
                 aria-label={this.props.dismissMenuAriaLabel}
                 onClick={() => {
-                    this.setState({ menuOpen: !this.state.menuOpen })
+                    this.setState({ menuOpen: !this.state.menuOpen });
                 }}
             />
         );
@@ -101,7 +101,7 @@ export class AdaptiveMenu extends React.Component<IAdaptiveMenuProps, IAdaptiveM
     private getMenu() {
         let menuItems: AdaptiveMenuItem[];
         menuItems = Object.assign([], this.props.menuItems);
-        for (var i = 0; i < menuItems.length; i++) {
+        for (let i = 0; i < menuItems.length; i++) {
             menuItems[i].className = "menu-item " + menuItems[i].className;
         }
         return (
@@ -129,7 +129,7 @@ export class AdaptiveMenu extends React.Component<IAdaptiveMenuProps, IAdaptiveM
 }
 
 interface IAdaptiveMenuItemComponentProps {
-    menuItem: AdaptiveMenuItem
+    menuItem: AdaptiveMenuItem;
 }
 
 class AdaptiveMenuItemComponent extends React.PureComponent<IAdaptiveMenuItemComponentProps> {
@@ -140,7 +140,7 @@ class AdaptiveMenuItemComponent extends React.PureComponent<IAdaptiveMenuItemCom
         return (
             <div role="menuitem" tabIndex={0}
                 className="actionsheet-item-container" key={this.props.menuItem.key}
-                onClick={() => { this.props.menuItem.onClick() }}
+                onClick={() => { this.props.menuItem.onClick(); }}
                 ref={(ref: HTMLElement) => {
                     if (ref) {
                         this.ref = ref;

@@ -1,5 +1,5 @@
-import { Status, ChecklistItemState } from './EnumContainer';
-import {ActionSDKUtils} from "./ActionSDKUtils";
+import { Status, ChecklistItemState } from "./EnumContainer";
+import {Utils} from "./Utils";
 
 export class ChecklistItem {
     title: string;
@@ -15,7 +15,7 @@ export class ChecklistItem {
     serverStatus?: Status;
     serverCompletionTime?: string;
     constructor(title: string = "", status: Status = Status.ACTIVE, subTitle: string = "", itemState: ChecklistItemState = ChecklistItemState.GENERATED, rowId: string = "",
-        creationTime: string = "", localKey: string = "", creatorUserId: string = "", completedUserId: string = "", completionTime: string = "", serverStatus: Status = Status.ACTIVE, serverCompletionTime: string = "") {
+                creationTime: string = "", localKey: string = "", creatorUserId: string = "", completedUserId: string = "", completionTime: string = "", serverStatus: Status = Status.ACTIVE, serverCompletionTime: string = "") {
         this.title = title;
         this.status = status;
         this.subTitle = subTitle;
@@ -29,7 +29,7 @@ export class ChecklistItem {
         if (localKey) {
             this.localKey = localKey;
         } else {
-            this.localKey = ActionSDKUtils.generateGUID();
+            this.localKey = Utils.generateGUID();
         }
         this.creatorUserId = creatorUserId;
         this.completedUserId = completedUserId;
@@ -55,16 +55,4 @@ export class ChecklistItemRow {
     creationUser: string = "";
     deletionTime: string = "";
     deletionUser: string = "";
-}
-
-
-export interface ChecklistViewData {
-    //actionInstanceTitle
-    ait: string;
-    //notificationSettingsMode
-  //  nsm?: NotificationSettingMode;
-    //notificationSettingsTime
-    nst?: number,
-    //actionInstanceRows
-    air: string[][];
 }

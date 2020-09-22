@@ -11,15 +11,16 @@ import {
   TrashCanIcon,
   UndoIcon,
 } from "@fluentui/react-northstar";
-import { isChecklistExpired, isChecklistClosed } from "../../utils/Utils";
 import { ChecklistGroupType } from "../../utils/EnumContainer";
 import { Localizer } from "../../utils/Localizer";
-import { IErrorProps, IUIProps, UxUtils } from "../../components/common";
+import {UxUtils} from "../../utils/UxUtils";
 
-export interface IChecklistItemProps extends IErrorProps, IUIProps {
+export interface IChecklistItemProps {
   sectionType: string;
   item: ChecklistItem;
   autoFocus: boolean;
+  closed: boolean;
+  expired: boolean;
   onUpdateItem?: (i: ChecklistItem, value: string) => void;
   onToggleDeleteItem?: (i: ChecklistItem) => void;
   onItemChecked?: (i: ChecklistItem, value: boolean) => void;
@@ -98,8 +99,8 @@ export class ChecklistItemView extends React.Component<IChecklistItemProps> {
 
   isReadOnly() {
     return (
-      isChecklistClosed() ||
-      isChecklistExpired() ||
+      this.props.closed ||
+      this.props.expired ||
       this.props.item.status != Status.ACTIVE
     );
   }
@@ -110,8 +111,8 @@ export class ChecklistItemView extends React.Component<IChecklistItemProps> {
 
   canDeleteItem() {
     return (
-      !isChecklistClosed() &&
-      !isChecklistExpired() &&
+      !this.props.closed &&
+      !this.props.expired &&
       this.props.item.status === Status.ACTIVE
     );
   }
@@ -145,8 +146,8 @@ export class ChecklistItemView extends React.Component<IChecklistItemProps> {
                 className="checklist-checkbox"
                 checked={getCheckedState(this.props.item.status)}
                 disabled={
-                  isChecklistExpired() ||
-                  isChecklistClosed() ||
+                  this.props.expired ||
+                  this.props.closed ||
                   this.isItemDeleted()
                 }
                 onChange={(e, props) => {
@@ -177,8 +178,8 @@ export class ChecklistItemView extends React.Component<IChecklistItemProps> {
       fluid: true,
       defaultValue: this.props.item.title,
       readOnly:
-        isChecklistExpired() ||
-        isChecklistClosed() ||
+        this.props.expired ||
+        this.props.closed ||
         this.props.item.status != Status.ACTIVE,
       input: {
         className: this.getInputStyle(),

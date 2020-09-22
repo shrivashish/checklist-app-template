@@ -1,26 +1,20 @@
 import { createStore } from "satcheljs";
-
 import { ChecklistItem } from "../utils";
 import "../orchestrators/CreationOrchestrators";
 import "../mutator/CreationMutator";
 import * as actionSDK from "@microsoft/m365-action-sdk";
-import { ActionSDKUtils } from "../utils/ActionSDKUtils";
-import { ISettingsComponentProps, ResultVisibility, NotificationSettings, NotificationSettingMode } from "../../src/components/SettingsComponent";
-import { InitializationState, Constants } from "../../src/components/common";
+import {ProgressState} from "../utils/SharedEnum";
 
-export enum Page {
-  Main,
-  Settings,
-}
+/**
+ * Creation store containing all data required at the time of creation.
+ */
 
 interface IChecklistCreationStore {
   context: actionSDK.ActionSdkContext;
   title: string;
   items: ChecklistItem[];
-  settings: ISettingsComponentProps;
   showBlankTitleError: boolean;
-  currentPage: Page;
-  isInitialized: InitializationState;
+  progressState: ProgressState;
   isSending: boolean;
   canChecklistExpire: boolean;
 }
@@ -29,20 +23,8 @@ const store: IChecklistCreationStore = {
   context: null,
   title: "",
   items: [new ChecklistItem()],
-  settings: {
-    resultVisibility: ResultVisibility.All,
-    dueDate: ActionSDKUtils.getDefaultExpiry(15).getTime(),
-    notificationSettings: new NotificationSettings(
-      NotificationSettingMode.Daily,
-      Constants.DEFAULT_DAILY_NOTIFICATION_TIME
-    ),
-    isResponseEditable: true,
-    isResponseAnonymous: false,
-    strings: null,
-  },
   showBlankTitleError: false,
-  currentPage: Page.Main,
-  isInitialized: InitializationState.NotInitialized,
+  progressState: ProgressState.NotStarted,
   isSending: false,
   canChecklistExpire: false,
 };

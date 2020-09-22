@@ -31,48 +31,44 @@ module.exports = (env) => {
                         chunks: 'all',
                         priority: 2,
                     },
-                    StardustUI: {
-                        test: /node_modules[\\/]((@stardust-ui))[\\/]/,
+                    FluentUI: {
+                        test: /node_modules[\\/]((@fluentui))[\\/]/,
                         enforce: true,
-                        name: 'StardustUI',
+                        name: 'FluentUI',
                         chunks: 'all',
                         priority: 2
                     },
-                    StardustUITheme: {
-                        test: /node_modules[\\/]((@stardust-ui).*(themes).*)[\\/]/,
+                    FluentUITheme: {
+                        test: /node_modules[\\/]((@fluentui).*(themes).*)[\\/]/,
                         enforce: true,
-                        name: 'StardustUITheme',
+                        name: 'FluentUITheme',
                         chunks: 'all',
                         priority: 3
                     },
                     ActionSDK: {
-                        test: /ActionSDK[\\/]/,
+                        test: /node_modules[\\/]((@microsoft\/m365-action-sdk))[\\/]/,
                         enforce: true,
                         name: 'ActionSDK',
                         chunks: 'all',
                         priority: 2
-                    }
+                    },
                 }
             }
         },
         resolve: {
-            extensions: [".ts", ".tsx", ".js", ".jsx", ".scss"],
-            alias: {
-                "@sharedUI": path.resolve(__dirname, "./src/SharedUI/src/")
-            }
+            extensions: [".ts", ".tsx", ".js", ".jsx", ".scss"]
         },
         module: {
             rules: [{
-                    test: /\.tsx?$/,
-                    loader: "ts-loader"
-                },
-                {
-                    test: /\.scss$/,
-                    loader: [
-                        require.resolve('style-loader'), require.resolve('css-loader'), require.resolve('sass-loader')
-                    ]
-                }
-
+                test: /\.tsx?$/,
+                loader: "ts-loader"
+            },
+            {
+                test: /\.scss$/,
+                loader: [
+                    require.resolve('style-loader'), require.resolve('css-loader'), require.resolve('sass-loader')
+                ]
+            }
             ]
         }
     }
@@ -92,23 +88,26 @@ module.exports = (env) => {
         }));
     }
     // Process other assets
-    var copyAssets = [{
-            from: 'actionManifest.json',
-            to: path.resolve(__dirname, 'output')
-        },
-        {
-            from: 'actionModel.json',
-            to: path.resolve(__dirname, 'output')
-        },
-        {
-            from: 'views',
-            to: path.resolve(__dirname, 'output')
-        },
-        {
-            from: 'assets',
-            to: path.resolve(__dirname, 'output')
-        }
-    ];
+    var copyAssets = {
+        patterns: [
+            {
+                from: 'actionManifest.json',
+                to: path.resolve(__dirname, 'output')
+            },
+            {
+                from: 'actionModel.json',
+                to: path.resolve(__dirname, 'output')
+            },
+            {
+                from: 'views',
+                to: path.resolve(__dirname, 'output')
+            },
+            {
+                from: 'assets',
+                to: path.resolve(__dirname, 'output')
+            }
+        ]
+    };
 
     config.plugins.push(new CopyWebpackPlugin(copyAssets));
     config.plugins.push(new CleanWebpackPlugin());

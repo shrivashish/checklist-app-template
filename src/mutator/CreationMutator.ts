@@ -6,45 +6,46 @@ import {
   changeItemCheckedStatus,
   updateChoiceText,
   updateTitle,
-  setSettings,
   setContext,
-  setAppInitialized,
+  setProgressState,
   setSendingFlag,
-  goToPage,
 } from "../actions/CreationActions";
 import {
   Status,
   ChecklistItem,
   checklistItemState,
-  ChecklistViewData,
 } from "../utils";
 import getStore from "../store/CreationStore";
 import * as actionSDK from "@microsoft/m365-action-sdk";
-import { ActionSDKUtils } from "../utils/ActionSDKUtils";
-import { ISettingsComponentProps } from "../../src/components/SettingsComponent";
+import { Utils } from "../utils/Utils";
 
-mutator(setAppInitialized, (msg) => {
+mutator(setProgressState, (msg) => {
   const store = getStore();
-  store.isInitialized = msg.state;
+  store.progressState = msg.state;
 });
+
+/**
+ * Creation view mutators to modify store data on which create view relies
+ */
 
 mutator(setContext, (msg) => {
   const store = getStore();
   store.context = msg.context;
-  if (!ActionSDKUtils.isEmptyObject(store.context.lastSessionData)) {
+  if (!Utils.isEmptyObject(store.context.lastSessionData)) {
+    //Store data to retrieve on card preview screen.
     const lastSessionData = store.context.lastSessionData;
     const actionInstance: actionSDK.Action = lastSessionData.action;
     const actionInstanceRows = lastSessionData.dataRows;
-   
+
     const itemsCopy: ChecklistItem[] = [];
     if (actionInstanceRows && actionInstanceRows.length > 0) {
       actionInstanceRows.forEach((rowItem, index) => {
-        let title = rowItem.columnValues['checklistItem'];
-        let state:Status
-        if(rowItem.columnValues['status'] == Status.ACTIVE){
+        let title = rowItem.columnValues["checklistItem"];
+        let state:Status;
+        if(rowItem.columnValues["status"] == Status.ACTIVE) {
          state = Status.ACTIVE;
       }
-        if (rowItem.columnValues['status'] == Status.COMPLETED) {
+        if (rowItem.columnValues["status"] == Status.COMPLETED) {
           state = Status.COMPLETED;
         }
         let item: ChecklistItem = new ChecklistItem(
@@ -68,7 +69,7 @@ mutator(setContext, (msg) => {
 mutator(addChoice, () => {
   const store = getStore();
   const itemsCopy = [...store.items];
-  var item = new ChecklistItem();
+  let item = new ChecklistItem();
   itemsCopy.push(item);
   store.items = itemsCopy;
 });
@@ -90,7 +91,7 @@ mutator(changeItemCheckedStatus, (msg) => {
   let state: boolean = msg.state;
   const store = getStore();
   const itemsCopy = [...store.items];
-  var index = itemsCopy.indexOf(item);
+  let index = itemsCopy.indexOf(item);
   if (index > -1) {
     itemsCopy[index] = itemsCopy[index].clone();
     if (state) {
@@ -108,7 +109,7 @@ mutator(updateChoiceText, (msg) => {
   let text: string = msg.text;
   const store = getStore();
   const itemsCopy = [...store.items];
-  var index = itemsCopy.indexOf(item);
+  let index = itemsCopy.indexOf(item);
   if (index > -1) {
     itemsCopy[index] = itemsCopy[index].clone();
     itemsCopy[index].title = text;
@@ -122,17 +123,6 @@ mutator(updateTitle, (msg) => {
   const store = getStore();
   store.showBlankTitleError = false;
   store.title = title;
-});
-
-mutator(setSettings, (msg) => {
-  let settingProps: ISettingsComponentProps = msg.settingProps;
-  const store = getStore();
-  store.settings = settingProps;
-});
-
-mutator(goToPage, (msg) => {
-  const store = getStore();
-  store.currentPage = msg.page;
 });
 
 mutator(setSendingFlag, (msg) => {

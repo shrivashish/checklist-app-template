@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { Flex, Text } from '@fluentui/react-northstar';
-import './NavBarComponent.scss';
+import * as React from "react";
+import { Flex, Text } from "@fluentui/react-northstar";
+import "./NavBarComponent.scss";
 
 export enum NavBarItemType {
     BACK
@@ -29,18 +29,6 @@ export class NavBarComponent extends React.PureComponent<INavBarComponentProps> 
         this.registerBackButtonHandlerIfRequired(this.props.rightNavBarItem);
     }
 
-    private registerBackButtonHandlerIfRequired(navBarItem: INavBarItem) {
-        if (!navBarItem) {
-            return;
-        }
-        if (navBarItem.type == NavBarItemType.BACK && navBarItem.onClick) {
-            // ActionSDK.APIs.registerBackButtonHandler(() => {
-            //     navBarItem.onClick();
-            // });
-            this.isBackButtonHandlerRegistered = true;
-        }
-    }
-
     componentWillUnmount() {
         if (this.isBackButtonHandlerRegistered) {
             //ActionSDK.APIs.registerBackButtonHandler(null);
@@ -60,6 +48,18 @@ export class NavBarComponent extends React.PureComponent<INavBarComponentProps> 
         );
     }
 
+    private registerBackButtonHandlerIfRequired(navBarItem: INavBarItem) {
+        if (!navBarItem) {
+            return;
+        }
+        if (navBarItem.type == NavBarItemType.BACK && navBarItem.onClick) {
+            // ActionSDK.APIs.registerBackButtonHandler(() => {
+            //     navBarItem.onClick();
+            // });
+            this.isBackButtonHandlerRegistered = true;
+        }
+    }
+
     private getNavBarItem(navBarItem: INavBarItem) {
         if (!navBarItem) {
             return null;
@@ -70,7 +70,7 @@ export class NavBarComponent extends React.PureComponent<INavBarComponentProps> 
                 className={navBarItemClassName}
                 role="button"
                 aria-label={navBarItem.ariaLabel}
-                onClick={() => { navBarItem.onClick() }}
+                onClick={() => { navBarItem.onClick(); }}
                 tabIndex={0}
             >
                 {navBarItem.icon}

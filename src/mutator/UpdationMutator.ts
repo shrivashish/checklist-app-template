@@ -22,9 +22,8 @@ import {
   ChecklistItemRow,
   ChecklistColumnType,
   checklistItemState,
-  getStatus,
-  getCompletedSubtext,
 } from "../utils";
+import { getStatus,getCompletedSubtext} from "../helper/UpdationHelper";
 import getStore from "../store/UpdationStore";
 import {
   addChoice,
@@ -34,15 +33,18 @@ import {
   shouldValidateUI,
   addChecklistItems,
   showMoreOptions,
-  setAppInitialized,
-  updateDueDate,
+  setProgressState,
 } from "../actions/UpdationActions";
 import * as actionSDK from "@microsoft/m365-action-sdk";
-import { ActionSDKUtils } from "../utils/ActionSDKUtils";
+import { Utils } from "../utils/Utils";
 
-mutator(setAppInitialized, (msg) => {
+/**
+ * Update view mutators to modify store data on which update view relies
+ */
+
+mutator(setProgressState, (msg) => {
   const store = getStore();
-  store.isInitialized = msg.state;
+  store.progressState = msg.state;
 });
 
 mutator(setContext, (msg) => {
@@ -94,11 +96,6 @@ mutator(closeChecklist, (msg) => {
   const store = getStore();
   store.closingChecklist = msg.closingChecklist;
   resetNetworkError();
-});
-
-mutator(updateDueDate, (msg) => {
-  const store = getStore();
-  store.updatingDueDate = msg.updatingDueDate;
 });
 
 mutator(setDownloadingData, (msg) => {
@@ -207,8 +204,8 @@ mutator(updateSubtitleText, (msg) => {
   const itemsCopy = [...store.items];
   for (let item of itemsCopy) {
     if (
-      !ActionSDKUtils.isEmptyString(item.completedUserId) &&
-      !ActionSDKUtils.isEmptyString(item.completionTime)
+      !Utils.isEmptyString(item.completedUserId) &&
+      !Utils.isEmptyString(item.completionTime)
     ) {
       item.subTitle = getCompletedSubtext(
         userIdToProfileMap[item.completedUserId],

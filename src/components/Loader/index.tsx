@@ -1,1 +1,1 @@
-export {LoaderUI, ILoaderUIProps} from './LoaderUI';
+export {LoaderUI, ILoaderUIProps} from "./LoaderUI";

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { observer } from "mobx-react";
 import getStore from "../../store/UpdationStore";
-import getCreationStore from "../../store/CreationStore";
 import {
   updateActionInstance,
   addChoice,
@@ -13,11 +12,10 @@ import {
   checklistDeleteAlertOpen,
   deleteChecklist,
   checklistExpiryChangeAlertOpen,
-  updateDueDate,
   setDownloadingData,
   addActionInstance
 } from "../../actions/UpdationActions";
-import "../../css/updation";
+import "../Updation/Updation.scss";
 import {
   Flex,
   Dialog,
@@ -29,33 +27,31 @@ import {
   CalendarIcon,
   BanIcon,
   TrashCanIcon,
+  Button
 } from "@fluentui/react-northstar";
 import {
   ChecklistGroupType,
-  isChecklistExpired
 } from "../../utils";
-import {ChecklistGroupContainer} from "../ChecklistGroupContainer";
-import { setSettings } from "../../actions/CreationActions";
+import {isChecklistExpired} from "../../helper/UpdationHelper";
+import {ChecklistGroupContainer} from "./ChecklistGroupContainer";
 import {
   isChecklistClosed,
   getDateString,
   isChecklistCreatedByMe,
   isChecklistDirty,
-} from "../../utils/Utils";
+} from "../../helper/UpdationHelper";
 
 import * as actionSDK from "@microsoft/m365-action-sdk";
 import { Localizer } from "../../utils/Localizer";
-import { ISettingsComponentProps } from "../SettingsComponent";
 import { AdaptiveMenuItem, AdaptiveMenu, AdaptiveMenuRenderStyle } from "../Menu";
-import { InitializationState, UxUtils, Constants } from "../common";
+import {UxUtils} from "../../utils/UxUtils";
+import {ProgressState} from "../../utils/SharedEnum";
+import {Constants} from "../../utils/Constants";
 import { LoaderUI } from "../Loader";
 import { ErrorView } from "../ErrorView";
 import { ShimmerContainer } from "../ShimmerLoader";
 import { AccessibilityAlert } from "../AccessibilityAlert/AccessibilityAlert";
-import { DateTimePickerView } from "../DateTime";
-import { ButtonComponent } from "../Button";
 import { ActionSdkHelper } from "../../helper/ActionSdkHelper";
-
 
 @observer
 export default class UpdationPage extends React.Component<any, any> {
@@ -64,14 +60,14 @@ export default class UpdationPage extends React.Component<any, any> {
     if (hostContext) {
      ActionSdkHelper.hideLoadIndicator();
     } else {
-      if (getStore().isInitialized == InitializationState.NotInitialized) {
+      if (getStore().progressState == ProgressState.NotStarted || getStore().progressState==ProgressState.InProgress) {
         return <LoaderUI fill />;
       }
     }
 
     if (getStore().isActionDeleted) {
      ActionSdkHelper.hideLoadIndicator();
-      return (
+     return (
         <ErrorView
           title={Localizer.getString("ChecklistDeletedError")}
           subtitle={Localizer.getString("ChecklistDeletedErrorDescription")}
@@ -81,9 +77,9 @@ export default class UpdationPage extends React.Component<any, any> {
       );
     }
 
-    if (getStore().isInitialized === InitializationState.Failed) {
+    if (getStore().progressState === ProgressState.Failed) {
      ActionSdkHelper.hideLoadIndicator();
-      return (
+     return (
         <ErrorView
           title={Localizer.getString("GenericError")}
           buttonTitle={Localizer.getString("Close")}
@@ -91,7 +87,7 @@ export default class UpdationPage extends React.Component<any, any> {
       );
     }
 
-    if (getStore().isInitialized == InitializationState.Initialized) {
+    if (getStore().progressState == ProgressState.Completed) {
       ActionSdkHelper.hideLoadIndicator();
     }
 
@@ -101,36 +97,14 @@ export default class UpdationPage extends React.Component<any, any> {
           {this.getHeaderContainer()}
           {this.getHintText()}
           {this.getItemsGroupSection(ChecklistGroupType.Open)}
-          {getStore().isInitialized == InitializationState.Initialized &&
+          {getStore().progressState == ProgressState.Completed &&
             this.getItemsGroupSection(ChecklistGroupType.Completed)}
         </Flex>
         {
-        getStore().isInitialized != InitializationState.Initialized
+        getStore().progressState != ProgressState.Completed
           ? null
           : this.getFooterSection()}
       </>
-    );
-  }
-
-  private getHeaderContainer(): JSX.Element {
-    return (
-      <ShimmerContainer
-        fill
-        showShimmer={!getStore().actionInstance}
-        width={["50%"]}
-      >
-        <Flex vAlign="center" className={"header-container"}>
-          <Text size="large" weight="bold">
-            {getStore().actionInstance
-              ? getStore().actionInstance.displayName
-              : "ChecklistTitle"}
-          </Text>
-          {this.getMenu()}
-          {this.getCloseAlertDialog()}
-          {this.getDeleteAlertDialog()}
-          {this.getExpiryUpdateDialog()}
-        </Flex>
-      </ShimmerContainer>
     );
   }
 
@@ -183,79 +157,10 @@ export default class UpdationPage extends React.Component<any, any> {
         }}
         showShimmer={
           checklistGroupType == ChecklistGroupType.Open &&
-          getStore().isInitialized != InitializationState.Initialized
+          getStore().progressState != ProgressState.Completed
         }
       />
     );
-  }
-
-  private getMenu() {
-    let menuItems: AdaptiveMenuItem[] = this.getMenuItems();
-    if (menuItems.length == 0) {
-      return null;
-    }
-    return (
-      <AdaptiveMenu
-        key="checklist_options"
-        className="triple-dot-menu"
-        renderAs={
-          UxUtils.renderingForMobile()
-            ? AdaptiveMenuRenderStyle.ACTIONSHEET
-            : AdaptiveMenuRenderStyle.MENU
-        }
-        content={
-          <MoreIcon
-            title={Localizer.getString("MoreOptions")}
-            outline
-            aria-hidden={false}
-            role="button"
-          />
-        }
-        menuItems={menuItems}
-        dismissMenuAriaLabel={Localizer.getString("DismissMenu")}
-      />
-    );
-  }
-
-  private getMenuItems(): AdaptiveMenuItem[] {
-    let menuItemList: AdaptiveMenuItem[] = [];
-    if (isChecklistCreatedByMe()) {
-      if (!isChecklistClosed() && !isChecklistExpired()) {
-        if (
-          getStore().actionInstance.expiryTime !=
-          Constants.ACTION_INSTANCE_INDEFINITE_EXPIRY
-        ) {
-          let changeExpiry: AdaptiveMenuItem = {
-            key: "changeDueDate",
-            content: Localizer.getString("ChangeDate"),
-            icon: <CalendarIcon outline={true} />,
-            onClick: () => {
-              checklistExpiryChangeAlertOpen(true);
-            },
-          };
-          menuItemList.push(changeExpiry);
-        }
-        let closeCL: AdaptiveMenuItem = {
-          key: "close",
-          content: Localizer.getString("CloseChecklist"),
-          icon: <BanIcon outline={true} />,
-          onClick: () => {
-            checklistCloseAlertOpen(true);
-          },
-        };
-        menuItemList.push(closeCL);
-      }
-      let deleteCL: AdaptiveMenuItem = {
-        key: "delete",
-        content: Localizer.getString("DeleteChecklist"),
-        icon: <TrashCanIcon outline={true} />,
-        onClick: () => {
-          checklistDeleteAlertOpen(true);
-        },
-      };
-      menuItemList.push(deleteCL);
-    }
-    return menuItemList;
   }
 
   getCloseAlertDialog() {
@@ -407,34 +312,15 @@ export default class UpdationPage extends React.Component<any, any> {
               Localizer.getString("Change")
             )
           }
-          content={
-            <DateTimePickerView
-              showTimePicker
-              locale={getStore().context.locale}
-              renderForMobile={UxUtils.renderingForMobile()}
-              minDate={new Date()}
-              value={new Date(getStore().actionInstance.expiryTime)}
-              placeholderDate={Localizer.getString("SelectADate")}
-              placeholderTime={Localizer.getString("SelectATime")}
-              onSelect={(date: Date) => {
-                let props: ISettingsComponentProps = {
-                  ...getCreationStore().settings,
-                };
-                props.dueDate = date.getTime();
-                setSettings(props);
-              }}
-            />
-          }
+
           header="Action confirmation"
           onCancel={() => {
             checklistExpiryChangeAlertOpen(false);
           }}
           onConfirm={() => {
-            updateDueDate(getCreationStore().settings.dueDate, true);
             let actionInstance: actionSDK.Action = {
               ...getStore().actionInstance,
             };
-            actionInstance.expiryTime = getCreationStore().settings.dueDate;
             addActionInstance(actionInstance);
           }}
         />
@@ -459,17 +345,18 @@ export default class UpdationPage extends React.Component<any, any> {
           />
         ) : null}
         <FlexItem push>
-          <ButtonComponent
+          <Button
             secondary
-            showLoader={getStore().downloadingData}
+            loading={getStore().downloadingData}
+            disabled={getStore().downloadingData}
             content={Localizer.getString("DownloadReport")}
             onClick={() => {
               setDownloadingData(true);
             }}
           />
         </FlexItem>
-        <ButtonComponent
-          showLoader={getStore().isSending}
+        <Button
+          loading={getStore().isSending}
           disabled={isChecklistExpired() || isChecklistClosed()}
           primary
           content={Localizer.getString("SaveChanges")}
@@ -479,5 +366,96 @@ export default class UpdationPage extends React.Component<any, any> {
         />
       </Flex>
     );
+  }
+
+  private getHeaderContainer(): JSX.Element {
+    return (
+      <ShimmerContainer
+        fill
+        showShimmer={!getStore().actionInstance}
+        width={["50%"]}
+      >
+        <Flex vAlign="center" className={"header-container"}>
+          <Text size="large" weight="bold">
+            {getStore().actionInstance
+              ? getStore().actionInstance.displayName
+              : "ChecklistTitle"}
+          </Text>
+          {this.getMenu()}
+          {this.getCloseAlertDialog()}
+          {this.getDeleteAlertDialog()}
+          {this.getExpiryUpdateDialog()}
+        </Flex>
+      </ShimmerContainer>
+    );
+  }
+
+  private getMenu() {
+    let menuItems: AdaptiveMenuItem[] = this.getMenuItems();
+    if (menuItems.length == 0) {
+      return null;
+    }
+    return (
+      <AdaptiveMenu
+        key="checklist_options"
+        className="triple-dot-menu"
+        renderAs={
+          UxUtils.renderingForMobile()
+            ? AdaptiveMenuRenderStyle.ACTIONSHEET
+            : AdaptiveMenuRenderStyle.MENU
+        }
+        content={
+          <MoreIcon
+            title={Localizer.getString("MoreOptions")}
+            outline
+            aria-hidden={false}
+            role="button"
+          />
+        }
+        menuItems={menuItems}
+        dismissMenuAriaLabel={Localizer.getString("DismissMenu")}
+      />
+    );
+  }
+
+  private getMenuItems(): AdaptiveMenuItem[] {
+    let menuItemList: AdaptiveMenuItem[] = [];
+    if (isChecklistCreatedByMe()) {
+      if (!isChecklistClosed() && !isChecklistExpired()) {
+        if (
+          getStore().actionInstance.expiryTime !=
+          Constants.ACTION_INSTANCE_INDEFINITE_EXPIRY
+        ) {
+          let changeExpiry: AdaptiveMenuItem = {
+            key: "changeDueDate",
+            content: Localizer.getString("ChangeDate"),
+            icon: <CalendarIcon outline={true} />,
+            onClick: () => {
+              checklistExpiryChangeAlertOpen(true);
+            },
+          };
+          menuItemList.push(changeExpiry);
+        }
+        let closeCL: AdaptiveMenuItem = {
+          key: "close",
+          content: Localizer.getString("CloseChecklist"),
+          icon: <BanIcon outline={true} />,
+          onClick: () => {
+            checklistCloseAlertOpen(true);
+          },
+        };
+        menuItemList.push(closeCL);
+      }
+      let deleteCL: AdaptiveMenuItem = {
+        key: "delete",
+        content: Localizer.getString("DeleteChecklist"),
+        icon: <TrashCanIcon outline={true} />,
+        onClick: () => {
+          checklistDeleteAlertOpen(true);
+        },
+      };
+      menuItemList.push(deleteCL);
+    }
+    return menuItemList;
   }
 }

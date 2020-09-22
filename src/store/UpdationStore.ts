@@ -3,7 +3,11 @@ import { ChecklistItem } from "../utils";
 import "../mutator/UpdationMutator";
 import "../orchestrators/UpdationOrchestrators";
 import * as actionSDK from "@microsoft/m365-action-sdk";
-import { InitializationState } from "../../src/components/common";
+import {ProgressState} from "../utils/SharedEnum";
+
+/**
+ * Updation store containing all data required when user edits the checklist. 
+ */
 
 interface IChecklistUpdationStore {
   context: actionSDK.ActionSdkContext;
@@ -15,7 +19,7 @@ interface IChecklistUpdationStore {
   isChecklistCloseAlertOpen: boolean;
   isChecklistDeleteAlertOpen: boolean;
   isChecklistExpiryAlertOpen: boolean;
-  isInitialized: InitializationState;
+  progressState: ProgressState;
   downloadingData: boolean;
   isSending: boolean;
   deletingChecklist: boolean;
@@ -38,7 +42,7 @@ const store: IChecklistUpdationStore = {
   actionInstanceRows: null,
   isChecklistDeleteAlertOpen: false,
   isChecklistExpiryAlertOpen: false,
-  isInitialized: InitializationState.NotInitialized,
+  progressState: ProgressState.NotStarted,
   downloadingData: false,
   isSending: false,
   deletingChecklist: false,

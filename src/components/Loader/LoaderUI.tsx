@@ -2,7 +2,7 @@ import * as React from "react";
 import { Flex, LoaderProps, Loader } from "@fluentui/react-northstar";
 
 export interface ILoaderUIProps extends LoaderProps {
-    fill?: boolean
+    fill?: boolean;
 }
 
 export class LoaderUI extends React.Component<ILoaderUIProps> {

@@ -1,4 +1,5 @@
 {
+    "tag": "checklist-teams-app",
     "id": "<packageId>",
     "name": "Checklist",
     "description": "Create a shared checklist",

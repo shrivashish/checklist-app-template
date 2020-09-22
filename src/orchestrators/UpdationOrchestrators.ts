@@ -1,98 +1,80 @@
 import {
-  closeChecklist,
-  checklistCloseAlertOpen,
-  deleteChecklist,
-  checklistDeleteAlertOpen,
-  updateDueDate,
-  checklistExpiryChangeAlertOpen,
-  setContext,
-  fetchActionInstanceRowsUserDetails,
-  updateSubtitleText,
-  setDownloadingData,
-  setSendingFlag,
-  saveChangesFailed,
-  downloadReportFailed,
-  closeChecklistFailed,
-  deleteChecklistFailed,
-  setIsActionDeleted,
+    closeChecklist,
+    checklistCloseAlertOpen,
+    deleteChecklist,
+    checklistDeleteAlertOpen,
+    setContext,
+    fetchActionInstanceRowsUserDetails,
+    setDownloadingData,
+    setSendingFlag,
+    saveChangesFailed,
+    downloadReportFailed,
+    closeChecklistFailed,
+    deleteChecklistFailed,
+    setIsActionDeleted,
 } from "./../actions/UpdationActions";
 
 import { orchestrator } from "satcheljs";
 import {
-  initialize,
-  fetchActionInstance,
-  fetchActionInstanceRows,
-  addActionInstance,
-  updateActionInstance,
-  setAppInitialized,
+    initialize,
+    fetchActionInstance,
+    fetchActionInstanceRows,
+    addActionInstance,
+    updateActionInstance,
+    setProgressState,
 } from "../actions/UpdationActions";
 import getStore from "../store/UpdationStore";
-import getCreationStore from "../store/CreationStore";
-import { fetchAllActionInstanceRows, updateChecklistRows } from "../utils";
+import { fetchAllActionInstanceRows, updateChecklistRows } from "../helper/UpdationHelper";
 import {
-  isChecklistClosed,
-  isChecklistExpired,
-  fetchActionInstanceRowsUserDetailsNow,
-} from "../utils/Utils";
+    fetchActionInstanceRowsUserDetailsNow,
+} from "../helper/UpdationHelper";
 
 import * as actionSDK from "@microsoft/m365-action-sdk";
-import { ActionSDKUtils } from "../utils/ActionSDKUtils";
-import { ActionError, ActionErrorCode } from "../utils/ActionError";
+import { Utils } from "../utils/Utils";
+import { ActionError } from "../utils/ActionError";
 import { Localizer } from "../utils/Localizer";
-import { InitializationState,Constants } from "../../src/components/common";
+import {ProgressState} from "../utils/SharedEnum";
+import { Constants } from "../utils/Constants";
 import { ActionSdkHelper } from "../helper/ActionSdkHelper";
 
 export enum HttpStatusCode {
-  Created = 201,
-  Unauthorized = 401,
-  NotFound = 404,
+    Created = 201,
+    Unauthorized = 401,
+    NotFound = 404,
 }
-
-const LOG_TAG = "ChecklistUpdation";
-
 const handleErrorResponse = (error: ActionError) => {
-  if (
-    error.errorProps &&
-    error.errorProps.statusCode == HttpStatusCode.NotFound
-  ) {
-    setIsActionDeleted(true);
-  }
+    if (error.errorProps && error.errorProps.statusCode == HttpStatusCode.NotFound) {
+        setIsActionDeleted(true);
+    }
 };
 
-orchestrator(initialize,async () => {
-  try{
-    let context = await ActionSdkHelper.getContext();
-    setContext(context);
-    Promise.all([
-      Localizer.initialize(),
-      fetchActionInstanceNow(),
-      fetchAllActionInstanceRows(),
-    ])
-      .then((results) => {
-        setAppInitialized(InitializationState.Initialized);
-      })
-      .catch((error) => {
-        setAppInitialized(InitializationState.Failed);
-      });
-  
-}
-  catch(error){
-    setAppInitialized(InitializationState.Failed);
-  }
+orchestrator(initialize, async () => {
+    let actionContext = await ActionSdkHelper.getContext();
+    if (actionContext.success) {
+        setContext(actionContext.context);
+        let localizer = await Localizer.initialize();
+        let actionInstance = await fetchActionInstanceNow();
+        let actionInstanceRows = await fetchAllActionInstanceRows();
+
+        if (localizer && actionInstance.success && actionInstanceRows.success) {
+            setProgressState(ProgressState.Completed);
+        } else {
+            setProgressState(ProgressState.Failed);
+        }
+    } else {
+        setProgressState(ProgressState.Failed);
+    }
 });
 
-function fetchActionInstanceNow(): Promise<boolean> {
-  return new Promise<boolean>(async(resolve, reject) => {
-    try {
-      let action = await ActionSdkHelper.getActionInstance(getStore().context.actionId);
-      addActionInstance(action);
-      resolve(true);
-      
-    } catch (error) {
-      handleErrorResponse(error);
-      reject(error);
+async function fetchActionInstanceNow() {
+    let actionInstance = await ActionSdkHelper.getActionInstance(getStore().context.actionId);
+    if (actionInstance.success) {
+        addActionInstance(actionInstance.action);
+        return { success: true };
+    } else {
+        handleErrorResponse(actionInstance.error);
+        return actionInstance;
     }
-  });
 }
 
 orchestrator(fetchActionInstance, fetchActionInstanceNow);
@@ -100,165 +82,139 @@ orchestrator(fetchActionInstance, fetchActionInstanceNow);
 orchestrator(fetchActionInstanceRows, fetchAllActionInstanceRows);
 
 orchestrator(fetchActionInstanceRowsUserDetails, (msg) => {
-  fetchActionInstanceRowsUserDetailsNow(msg.userIds);
+    fetchActionInstanceRowsUserDetailsNow(msg.userIds);
 });
 
 orchestrator(updateActionInstance, async () => {
-  let addRows = [];
-  let updateRows = [];
+    let addRows = [];
+    let updateRows = [];
 
-  var actionInstanceRows = updateChecklistRows(getStore().context.userId);
-  if (
-    ActionSDKUtils.isEmptyObject(actionInstanceRows) ||
-    actionInstanceRows.length == 0
-  ) {
-    await ActionSdkHelper.closeCardView();
-  } else {
-    setSendingFlag(true);
-    //Prepare Request arguments
-    actionInstanceRows.forEach((row) => {
-      if (ActionSDKUtils.isEmptyString(row.id)) {
-        row.id = ActionSDKUtils.generateGUID();
-        row.createTime = Date.now();
-        row.updateTime = Date.now();
-        addRows.push(row);
-      } else {
-        row.updateTime = Date.now();
-        updateRows.push(row);
-      }
-    });
+    let actionInstanceRows = updateChecklistRows(getStore().context.userId);
+    if (
+        Utils.isEmptyObject(actionInstanceRows) ||
+        actionInstanceRows.length == 0
+    ) {
+        await ActionSdkHelper.closeCardView();
+    } else {
+        setSendingFlag(true);
+        //Prepare Request arguments
+        actionInstanceRows.forEach((row) => {
+            if (Utils.isEmptyString(row.id)) {
+                row.id = Utils.generateGUID();
+                row.createTime = Date.now();
+                row.updateTime = Date.now();
+                addRows.push(row);
+            } else {
+                row.updateTime = Date.now();
+                updateRows.push(row);
+            }
+        });
 
-    ActionSDKUtils.announceText(Localizer.getString("SavingChanges"));
-        try{
-      let addorupdateResponse =  await ActionSdkHelper.addOrUpdateDataRows(addRows,updateRows);
-        setSendingFlag(false);
-        if (addorupdateResponse.success) {
-          ActionSDKUtils.announceText(Localizer.getString("Saved"));
-          await ActionSdkHelper.closeCardView();
+        Utils.announceText(Localizer.getString("SavingChanges"));
+        let response = await ActionSdkHelper.addOrUpdateDataRows(addRows, updateRows);
+        if (response.success) {
+            setSendingFlag(false);
+            if (response.addOrUpdateResponse.success) {
+                Utils.announceText(Localizer.getString("Saved"));
+                await ActionSdkHelper.closeCardView();
+            } else {
+                Utils.announceText(Localizer.getString("Failed"));
+                saveChangesFailed(true);
+            }
         } else {
-          ActionSDKUtils.announceText(Localizer.getString("Failed"));
-          saveChangesFailed(true);
-        }
-      }
-    catch(error) {
-        ActionSDKUtils.announceText(Localizer.getString("Failed"));
-        setSendingFlag(false);
-        saveChangesFailed(true);
-        handleErrorResponse(error);
-      };
-  }
-});
-
-
-orchestrator(setDownloadingData, async (msg) => {
-  try{
-    if (msg.downloadingData) {
-          let downloadDataResponse= await ActionSdkHelper.downloadResponseAsCSV(getStore().context.actionId,
-          Localizer.getString("ChecklistResult", getStore().actionInstance.displayName).substring(0, Constants.ACTION_RESULT_FILE_NAME_MAX_LENGTH));
-          setDownloadingData(false);
-          if (!downloadDataResponse.success) {
-            downloadReportFailed(true);
-          }
-        }
-      }
-        catch(error) {
-          setDownloadingData(false);
-          downloadReportFailed(true);
-          handleErrorResponse(error);
-        }
-});
-
-
-orchestrator(closeChecklist,async(msg) => {
-  let addRows = [];
-  let updateRows = [];
-  // if the checklist has unsaved changes and save first before closing
-  var actionInstanceRows = updateChecklistRows(getStore().context.userId);
-  if (
-    ActionSDKUtils.isEmptyObject(actionInstanceRows) ||
-    actionInstanceRows.length == 0
-  ) {
-    closeChecklistInternal(msg);
-  } else {
-    //Prepare Request arguments
-    actionInstanceRows.forEach((row) => {
-      if (ActionSDKUtils.isEmptyString(row.id)) {
-        row.id = ActionSDKUtils.generateGUID();
-        row.createTime = Date.now();
-        row.updateTime = Date.now();
-        addRows.push(row);
-      } else {
-        row.updateTime = Date.now();
-        updateRows.push(row);
-      }
-    });
-    ActionSDKUtils.announceText(Localizer.getString("SavingChanges"));
-        try{
-        let addorupdateResponse=await ActionSdkHelper.addOrUpdateDataRows(addRows,updateRows);
-        if (addorupdateResponse.success) {
-          closeChecklistInternal(msg);
-        } else {
-          closeChecklistFailed(true);
+            Utils.announceText(Localizer.getString("Failed"));
+            setSendingFlag(false);
+            saveChangesFailed(true);
+            handleErrorResponse(response.error);
         }
     }
-      catch(error) {
-        closeChecklistFailed(true);
+});
+
+orchestrator(setDownloadingData, async (msg) => {
+    try {
+        if (msg.downloadingData) {
+            let downloadDataResponse = await ActionSdkHelper.downloadResponseAsCSV(getStore().context.actionId,
+                Localizer.getString("ChecklistResult", getStore().actionInstance.displayName).substring(0, Constants.ACTION_RESULT_FILE_NAME_MAX_LENGTH));
+            setDownloadingData(false);
+            if (!downloadDataResponse.success) {
+                downloadReportFailed(true);
+            }
+        }
+    } catch (error) {
+        setDownloadingData(false);
+        downloadReportFailed(true);
         handleErrorResponse(error);
-      }
-  }
+    }
+});
+
+orchestrator(closeChecklist, async (msg) => {
+    let addRows = [];
+    let updateRows = [];
+    // if the checklist has unsaved changes and save first before closing
+    let actionInstanceRows = updateChecklistRows(getStore().context.userId);
+    if (
+        Utils.isEmptyObject(actionInstanceRows) ||
+        actionInstanceRows.length == 0
+    ) {
+        closeChecklistInternal(msg);
+    } else {
+        //Prepare Request arguments
+        actionInstanceRows.forEach((row) => {
+            if (Utils.isEmptyString(row.id)) {
+                row.id = Utils.generateGUID();
+                row.createTime = Date.now();
+                row.updateTime = Date.now();
+                addRows.push(row);
+            } else {
+                row.updateTime = Date.now();
+                updateRows.push(row);
+            }
+        });
+        Utils.announceText(Localizer.getString("SavingChanges"));
+        let response = await ActionSdkHelper.addOrUpdateDataRows(addRows, updateRows);
+        if (response.success) {
+            response.addOrUpdateResponse.success ? closeChecklistInternal(msg) : closeChecklistFailed(true);
+        } else {
+            closeChecklistFailed(true);
+            handleErrorResponse(response.error);
+        }
+    }
 });
 
 orchestrator(deleteChecklist, async (msg) => {
-  try{
-  if (msg.deletingChecklist) {
-        let deleteResponse=await ActionSdkHelper.deleteActionInstance(getStore().context.actionId);
-        checklistDeleteAlertOpen(false);
-        await ActionSdkHelper.closeCardView();
-        if (!deleteResponse.success) {
-          deleteChecklistFailed(true);
-        }
-      }
-    }
-      catch(error) {
-        deleteChecklistFailed(true);
-        handleErrorResponse(error);
-      }
-  });
-
-orchestrator(updateDueDate,async (actionMessage) => {
-  if (actionMessage.updatingDueDate) {
-    var actionInstanceUpdateInfo: actionSDK.ActionUpdateInfo = {
-      id: getStore().context.actionId,
-      version: getStore().actionInstance.version,
-      expiryTime: actionMessage.dueDate,
-    };
-        await ActionSdkHelper.updateActionInstanceStatus(actionInstanceUpdateInfo);
-        checklistExpiryChangeAlertOpen(false);
-        updateDueDate(getCreationStore().settings.dueDate, false);
-        // TODO - intimate user on failure
-  }
-  });
-
-async function closeChecklistInternal( msg: { closingChecklist: boolean }) {
-  try{
-  if (msg.closingChecklist) {
-    var actionInstanceUpdateInfo: actionSDK.ActionUpdateInfo = {
-      id: getStore().context.actionId,
-      version: getStore().actionInstance.version,
-      status: actionSDK.ActionStatus.Closed,
-    };
-        let updateActionResponse = await ActionSdkHelper.updateActionInstanceStatus(actionInstanceUpdateInfo);
-        checklistCloseAlertOpen(false);
-        if (updateActionResponse.success) {
-          await ActionSdkHelper.closeCardView();
+    if (msg && msg.deletingChecklist) {
+        let response = await ActionSdkHelper.deleteActionInstance(getStore().context.actionId);
+        if (response.success) {
+            checklistDeleteAlertOpen(false);
+            await ActionSdkHelper.closeCardView();
+            if (!response.deleteResponse.success) {
+                deleteChecklistFailed(true);
+            }
         } else {
-          closeChecklistFailed(true);
+            deleteChecklistFailed(true);
+            handleErrorResponse(response.error);
         }
-      }
     }
-      catch(error)  {
-        closeChecklistFailed(true);
-        handleErrorResponse(error);
-      }
-  }
+});
 
+async function closeChecklistInternal(msg: { closingChecklist: boolean }) {
+    if (msg && msg.closingChecklist) {
+        let actionInstanceUpdateInfo: actionSDK.ActionUpdateInfo = {
+            id: getStore().context.actionId,
+            version: getStore().actionInstance.version,
+            status: actionSDK.ActionStatus.Closed,
+        };
+        let response = await ActionSdkHelper.updateActionInstanceStatus(actionInstanceUpdateInfo);
+        if (response.success) {
+            checklistCloseAlertOpen(false);
+            if (response.updateResponse.success) {
+                await ActionSdkHelper.closeCardView();
+            } else {
+                closeChecklistFailed(true);
+            }
+        } else {
+            closeChecklistFailed(true);
+            handleErrorResponse(response.error);
+        }
+    }
+}

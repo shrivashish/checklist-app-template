@@ -1,5 +1,5 @@
 import * as React from "react";
-import './Shimmer.scss';
+import "./Shimmer.scss";
 import { ShimmerLoader, IShimmerLoaderProps } from "./ShimmerLoader";
 
 /**

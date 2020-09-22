@@ -1,9 +1,8 @@
 import * as React from "react";
 import "./ActionRootView.scss";
-import { Provider, teamsTheme, teamsDarkTheme, teamsHighContrastTheme, ThemePrepared } from '@fluentui/react-northstar'
+import { Provider, teamsTheme, teamsDarkTheme, teamsHighContrastTheme, ThemePrepared } from "@fluentui/react-northstar";
 import * as actionSDK from "@microsoft/m365-action-sdk";
-import { ErrorView } from "../ErrorView";
-import { ActionSDKUtils } from "../../utils/ActionSDKUtils";
+import { Utils } from "../../utils/Utils";
 import { ActionSdkHelper } from "../../helper/ActionSdkHelper";
 
 interface IActionRootViewState {
@@ -13,7 +12,6 @@ interface IActionRootViewState {
     meetingMemberCount?: number;
 }
 export class ActionRootView extends React.Component<any, IActionRootViewState> {
-    private LOG_TAG = "ActionRootView";
 
     constructor(props: any) {
         super(props);
@@ -25,14 +23,13 @@ export class ActionRootView extends React.Component<any, IActionRootViewState> {
     }
 
     async componentWillMount() {
-                let context: actionSDK.ActionSdkContext = await ActionSdkHelper.getContext();
-                this.setState({
-                    hostContext: context,
-                });
-
-
-            }
-    
+        let response = await ActionSdkHelper.getContext();
+        if (response.success) {
+            this.setState({
+                hostContext: response.context,
+            });
+        }
+    }
 
     render() {
         if (!this.state.hostContext) {
@@ -45,10 +42,10 @@ export class ActionRootView extends React.Component<any, IActionRootViewState> {
             this.state.hostContext.hostClientType
         );
 
-        let isRTL = ActionSDKUtils.isRTL(this.state.hostContext.locale);
+        let isRTL = Utils.isRTL(this.state.hostContext.locale);
         document.body.dir = isRTL ? "rtl" : "ltr";
 
-        ActionSDKUtils.announceText("");
+        Utils.announceText("");
 
         return (
             <Provider
@@ -83,10 +80,8 @@ export class ActionRootView extends React.Component<any, IActionRootViewState> {
             case "dark":
                 classNames.push("theme-dark");
                 break;
-            case "default":
-                classNames.push("theme-default");
-                break;
             default:
+                classNames.push("theme-default");
                 break;
         }
 
@@ -107,29 +102,5 @@ export class ActionRootView extends React.Component<any, IActionRootViewState> {
         }
 
         return classNames.join(" ");
-    }
-
-    private getUnsupportedPlatformErrorView() {
-        // As this is a temporary solution due to Teams Android
-        // bug# 3748272 we are not localizing any strings
-        let subtitle = "";
-        switch (this.state.hostContext.hostClientType) {
-            case "android":
-                subtitle =
-                    "Creation experience is currently not available on Android. Go ahead and use it from your PC";
-                break;
-            case "ios":
-                subtitle =
-                    "Creation experience is currently not available on iOS. Go ahead and use it from your PC";
-                break;
-        }
-        return (
-            <ErrorView
-                image={"./images/unsupportedPlatformError.png"}
-                title="Coming Soon!"
-                subtitle={subtitle}
-                buttonTitle="OK"
-            />
-        );
     }
 }
