@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import * as React from "react";
 import { Flex, Text, AddIcon } from "@fluentui/react-northstar";
 import { ChecklistGroupType, ChecklistItem } from "../../../utils/index";

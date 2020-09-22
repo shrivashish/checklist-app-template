@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import { action } from "satcheljs";
 import { ChecklistItem } from "../utils";
 import * as actionSDK from "@microsoft/m365-action-sdk";
@@ -63,4 +66,8 @@ export let setProgressState = action(ChecklistCreationAction.setProgressState, (
 export let setSendingFlag = action(
     ChecklistCreationAction.setSendingFlag,
     (value: boolean) => ({ value: value })
+<<<<<<< Updated upstream
 );
+=======
+);
+>>>>>>> Stashed changes

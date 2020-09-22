@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 export enum ActionErrorCode {
     Unknown = "Unknown",
     Unauthorized = "Unauthorized",

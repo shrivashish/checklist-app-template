@@ -1,3 +1,9 @@
+<<<<<<< Updated upstream
+=======
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+>>>>>>> Stashed changes
 import * as React from "react";
 
 import { Menu, Text, Flex, Dialog } from "@fluentui/react-northstar";

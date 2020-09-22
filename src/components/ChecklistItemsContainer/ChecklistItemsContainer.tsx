@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import * as React from "react";
 import { Status, ChecklistItem } from "../../utils/index";
 import "./ChecklistItemsContainer.scss";

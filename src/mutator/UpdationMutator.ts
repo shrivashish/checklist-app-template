@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import {
   checklistCloseAlertOpen,
   addActionInstance,
@@ -37,11 +40,19 @@ import {
 } from "../actions/UpdationActions";
 import * as actionSDK from "@microsoft/m365-action-sdk";
 import { Utils } from "../utils/Utils";
+<<<<<<< Updated upstream
 
 /**
  * Update view mutators to modify store data on which update view relies
  */
 
+=======
+
+/**
+ * Update view mutators to modify store data on which update view relies
+ */
+
+>>>>>>> Stashed changes
 mutator(setProgressState, (msg) => {
   const store = getStore();
   store.progressState = msg.state;

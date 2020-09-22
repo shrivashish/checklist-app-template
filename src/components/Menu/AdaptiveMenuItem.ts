@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 //import { IconProps } from "@fluentui/react-northstar";
 
 export interface AdaptiveMenuItem {

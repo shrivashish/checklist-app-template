@@ -1,3 +1,9 @@
+<<<<<<< Updated upstream
+=======
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+>>>>>>> Stashed changes
 import { Status, ChecklistItemState } from "./EnumContainer";
 import {Utils} from "./Utils";
 
@@ -55,4 +61,8 @@ export class ChecklistItemRow {
     creationUser: string = "";
     deletionTime: string = "";
     deletionUser: string = "";
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

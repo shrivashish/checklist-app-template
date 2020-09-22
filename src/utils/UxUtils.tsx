@@ -1,3 +1,9 @@
+<<<<<<< Updated upstream
+=======
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+>>>>>>> Stashed changes
 import * as React from "react";
 import { Constants } from "../utils/Constants";
 
@@ -29,4 +35,8 @@ export class UxUtils {
         let currentHostClientType = document.body.getAttribute("data-hostclienttype");
         return currentHostClientType && (currentHostClientType == "ios");
     }
+<<<<<<< Updated upstream
   }
+=======
+  }
+>>>>>>> Stashed changes

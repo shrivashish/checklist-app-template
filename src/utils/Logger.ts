@@ -1,3 +1,9 @@
+<<<<<<< Updated upstream
+=======
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+>>>>>>> Stashed changes
 export class Logger {
 
     public static logInfo(message: string) {
@@ -7,4 +13,8 @@ export class Logger {
     public static logError(message: string) {
         console.error(message);
     }
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes

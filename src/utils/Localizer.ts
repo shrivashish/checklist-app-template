@@ -1,3 +1,9 @@
+<<<<<<< Updated upstream
+=======
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+>>>>>>> Stashed changes
 import { ActionSdkHelper } from "../helper/ActionSdkHelper";
 
 export class Localizer {

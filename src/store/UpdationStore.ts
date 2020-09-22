@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import { createStore } from "satcheljs";
 import { ChecklistItem } from "../utils";
 import "../mutator/UpdationMutator";

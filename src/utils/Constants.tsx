@@ -1,3 +1,9 @@
+<<<<<<< Updated upstream
+=======
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+>>>>>>> Stashed changes
 import { DayOfWeek } from "office-ui-fabric-react/lib/Calendar";
 
 export class Constants {
@@ -10,4 +16,8 @@ export class Constants {
     public static readonly ACTION_RESULT_FILE_NAME_MAX_LENGTH: number = 50;
 
     public static readonly ADD_ITEM_DIV_ID = "add-options-cl";
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
