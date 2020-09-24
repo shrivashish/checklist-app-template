@@ -1,30 +1,30 @@
 # Checklist App Template
 
-| [Documentation](./wiki/Home.md) | [Deployment guide](./wiki/Deployment-guide.md) | [Architecture](./wiki/Solution-overview.md) |
+| [Documentation](https://github.com/shrivashish/checklist-app-template/wiki/Home.md) | [Deployment guide](https://github.com/shrivashish/checklist-app-template/wiki/Deployment-guide.md) | [Architecture](https://github.com/shrivashish/checklist-app-template/wiki/Solution-overview.md) |
 | ---- | ---- | ---- |
 
 Checklist is a custom [Teams message extension](https://docs.microsoft.com/en-us/microsoftteams/platform/messaging-extensions/what-are-messaging-extensions) app that enables you to collaborate with your team by creating a shared checklist in a chat or channel. Checklist app is supported across all platforms – Teams desktop, browser, iOS, and Android clients. It is ready for deployment as part of your existing Microsoft 365 subscription.
 
-![Checklist Template compose message screen](./wiki/images/ChecklistTemplateCompose.gif)
+![Checklist Template compose message screen](https://github.com/shrivashish/checklist-app-template/wiki/images/ChecklistTemplateCompose.gif)
 
 ### Key features
 * **Checklist creation:** Easily create Checklist, click **Menu (…)** below the box where you type your message. Name your checklist and add items to the checklist. You can add as many as 100 items to a checklist. When you are done, click **Send Checklist** to publish your checklist. 
 
-![Checklist Template Creation screen](./wiki/images/ChecklistTemplateCreation.png)
+![Checklist Template Creation screen](https://github.com/shrivashish/checklist-app-template/wiki/images/ChecklistTemplateCreation.png)
 
 * **Mark checklist items as completed:** To mark items of a checklist as completed, choose an item on the checklist card, and click  **Save Changes**. As people in your group or channel mark items, you will see updates to the response summary on the checklist card.
 
-![Checklist Template Submit screen](./wiki/images/ChecklistTemplateSubmit.png)
+![Checklist Template Submit screen](https://github.com/shrivashish/checklist-app-template/wiki/images/ChecklistTemplateSubmit.png)
 
 * **Add new checklist items:** To add new items to the checklist, click **Edit Checklist.**. Add new items to the checklist by clicking on Add Item. Completed section show all the completed checklist items with the details of who completed the item and the time of completion. Also, download a .csv file of your checklist items by selecting **Download Report**.
 
-![Checklist Template Update screen](./wiki/images/ChecklistTemplateUpdate.png)
+![Checklist Template Update screen](https://github.com/shrivashish/checklist-app-template/wiki/images/ChecklistTemplateUpdate.png)
 
 ## Get started
 
-Begin with the [Solution overview](./wiki/Solution-overview.md) to read about what the app does and how it works.
+Begin with the [Solution overview](https://github.com/shrivashish/checklist-app-template/wiki/Solution-overview.md) to read about what the app does and how it works.
 
-When you're ready to try out Checklist, or to use it in your own organization, follow the steps in the [Deployment guide](./wiki/Deployment-guide.md).
+When you're ready to try out Checklist, or to use it in your own organization, follow the steps in the [Deployment guide](https://github.com/shrivashish/checklist-app-template/wiki/Deployment-guide.md).
 
 ## Feedback
 
