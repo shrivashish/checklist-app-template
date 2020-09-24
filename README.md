@@ -1,6 +1,6 @@
 # Checklist App Template
 
-| [Documentation](https://github.com/shrivashish/checklist-app-template/wiki/Home.md) | [Deployment guide](https://github.com/shrivashish/checklist-app-template/wiki/Deployment-guide.md) | [Architecture](https://github.com/shrivashish/checklist-app-template/wiki/Solution-overview.md) |
+| [Documentation](https://github.com/shrivashish/checklist-app-template/wiki/Home) | [Deployment guide](https://github.com/shrivashish/checklist-app-template/wiki/Deployment-guide) | [Architecture](https://github.com/shrivashish/checklist-app-template/wiki/Solution-overview) |
 | ---- | ---- | ---- |
 
 Checklist is a custom [Teams message extension](https://docs.microsoft.com/en-us/microsoftteams/platform/messaging-extensions/what-are-messaging-extensions) app that enables you to collaborate with your team by creating a shared checklist in a chat or channel. Checklist app is supported across all platforms – Teams desktop, browser, iOS, and Android clients. It is ready for deployment as part of your existing Microsoft 365 subscription.
@@ -22,9 +22,9 @@ Checklist is a custom [Teams message extension](https://docs.microsoft.com/en-us
 
 ## Get started
 
-Begin with the [Solution overview](https://github.com/shrivashish/checklist-app-template/wiki/Solution-overview.md) to read about what the app does and how it works.
+Begin with the [Solution overview](https://github.com/shrivashish/checklist-app-template/wiki/Solution-overview) to read about what the app does and how it works.
 
-When you're ready to try out Checklist, or to use it in your own organization, follow the steps in the [Deployment guide](https://github.com/shrivashish/checklist-app-template/wiki/Deployment-guide.md).
+When you're ready to try out Checklist, or to use it in your own organization, follow the steps in the [Deployment guide](https://github.com/shrivashish/checklist-app-template/wiki/Deployment-guide).
 
 ## Feedback
 
